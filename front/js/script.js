@@ -1,5 +1,5 @@
 const server = "http://localhost:3000/api/products";
-const items = document.querySelector('#items');
+const itemsSection = document.querySelector('#items');
 
 
 async function get(url) {
@@ -11,7 +11,7 @@ async function get(url) {
     return result
 }
 
-function createItems(result) {
+function displayItems(result) {
     for (let i = 0; i < result.length; i++ ) {
         itemLink = document.createElement('a')
         itemLink.setAttribute('href', '../html/product.html?productId=' + result[i]._id)
@@ -28,7 +28,7 @@ function createItems(result) {
         itemArticle.appendChild(itemTitle)
         itemArticle.appendChild(itemText)
         itemLink.appendChild(itemArticle)
-        items.appendChild(itemLink)
+        itemsSection.appendChild(itemLink)
     }
 }
 
@@ -36,9 +36,9 @@ function errorServer() {
     alert("Problème de serveur, veuillez ressayer ultérieurement.")
 }
 
-async function initItems() {
-    let items = await get(server)
-    createItems(items)
+async function InitDisplayItems() {
+    let result = await get(server)
+    displayItems(result)
 }
 
-initItems()
+InitDisplayItems()
