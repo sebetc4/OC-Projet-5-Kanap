@@ -52,11 +52,11 @@ function displayCart(result, cart) {
                 cartItemContentDescription.appendChild(cartItemContentDescriptionTitle)
 
                 let cartItemContentDescriptionDescription = document.createElement('p')
-                cartItemContentDescriptionDescription.innerHTML = result[indexItem].name
+                cartItemContentDescriptionDescription.innerHTML = cart[i].color
                 cartItemContentDescription.appendChild(cartItemContentDescriptionDescription)
 
                 let cartItemContentDescriptionPrice = document.createElement('p')
-                cartItemContentDescriptionPrice.innerHTML = result[indexItem].price
+                cartItemContentDescriptionPrice.innerHTML = result[indexItem].price +"€"
                 cartItemContentDescription.appendChild(cartItemContentDescriptionPrice)
 
             cartItemContent.appendChild(cartItemContentDescription)

@@ -61,16 +61,9 @@ class itemCart {
     }
 }
 
-function addToCart() {
-    let numberItem = document.querySelector('#quantity').value
-    let colorItem = colorSelect.value
-    let newAdd = new itemCart(item._id, colorItem, numberItem)
-    modifyCart(newAdd)
-}
-
 function getCart() {
     let objLinea = localStorage.getItem("Cart");
-    let cart = JSON.parse(objLinea);
+    let cart = JSON.parse(localStorage.getItem("Cart"));
     return cart
 }
 
@@ -79,29 +72,9 @@ function setCart(cart) {
     localStorage.setItem("Cart", objLinea);
 }
 
-function modifyCart(newAdd) {
-    newAdd.value = parseInt(newAdd.value)
-    let cart = getCart()
-    if (newAdd.color && !isNaN(newAdd.value)) {
-        if (cart === null) {
-            cart = [newAdd]
-            alert(`Vous avez ajouté: ${newAdd.value} article(s) de couleur ${newAdd.color}`)
-        } else {
-            for (i = 0; i < cart.length; i++) {
-                if (cart[i]._id === newAdd._id && cart[i].color === newAdd.color) {
-                    newValue = parseInt(cart[i].value) + newAdd.value 
-                    if (newValue > 100) {
-                        newValue = 100
-                    }
-                    cart[i].value = newValue.toString()                  
-                    break
-                } else {
-                    cart.push(newAdd)
-                    alert(`Vous avez ajouté: ${newAdd.value} article(s) de couleur ${newAdd.color}`)
-                }
-            }
-        }
-        setCart(cart) 
+function checkErrorInput(newAdd) {
+    if (newAdd.color && !isNaN(parseInt(newAdd.value))) {
+        checkCart(newAdd)
     } else if (!newAdd.color && !isNaN(newAdd.value)) {
         alert("Veuillez entrer une couleur")
     } else if (newAdd.color && isNaN(newAdd.value)) {
@@ -110,6 +83,54 @@ function modifyCart(newAdd) {
         alert("Veuillez entrer un nombre d'article et une couleur")
     }
 }
+
+function checkCart(newAdd) {
+    let cart = getCart()
+    if (cart === null) {
+        cart = [newAdd]
+        endModifyCart(cart, newAdd.value, newAdd.color)
+    } else { 
+        checkItemInCart(newAdd, cart)
+    }
+}
+
+function checkItemInCart(newAdd, cart) {
+    let existingItem = false
+    let indexItem = undefined
+    for (i = 0; i < cart.length; i++) {
+        if (cart[i]._id === newAdd._id && cart[i].color === newAdd.color) {
+            existingItem = true
+            indexItem = i
+            break
+        } 
+    }
+    if (existingItem) {
+        modifyItemInCart(newAdd, cart, indexItem)
+    } else {
+        addItemInCart(newAdd, cart)
+    }
+}
+
+function modifyItemInCart(newAdd, cart, i) {
+    newValue = parseInt(cart[i].value) + parseInt(newAdd.value) 
+    cart[i].value = newValue.toString() 
+    endModifyCart(cart, newAdd.value, newAdd.color)
+}
+
+function addItemInCart(newAdd, cart) {
+    cart.push(newAdd)
+    endModifyCart(cart, newAdd.value, newAdd.color)   
+}
+
+function endModifyCart(cart, value, color) {
+    alert(`Vous avez ajouté: ${value} article(s) de couleur ${color}`)
+    setCart(cart)                  
+}
+
+function addToCart() {
+    checkErrorInput(new itemCart(item._id, colorSelect.value, document.querySelector('#quantity').value))
+}
+
 
 initDisplayItem()
 document.querySelector('#addToCart').addEventListener('click', addToCart)
