@@ -1,17 +1,34 @@
 const server = "http://localhost:3000/api/products";
 const colorSelect = document.querySelector('#colors');
-let item = undefined
 
 
-async function get(url, productId) {
-    let res = await fetch(url + "/" + productId)
-    let result = await res.json()
-    .catch(function(err) {
-        errorServer()
-    });
-    return result
+// Fonctions serveur
+async function getServer(url, productId) {
+    try {
+        let response = await fetch(url + "/" + productId)
+        if (response.ok) {
+            let result = await response.json()
+            return result
+        } else {
+            errorServer(response.status)
+        }
+    }
+    catch(e) {
+        console.log(e)
+    }
 }
 
+function errorServer(error) {
+    alert("Problème de serveur, veuillez ressayer ultérieurement.")
+    console.error('Erreur de serveur: ' + error)
+}
+
+// Fonction affichage de l'item
+function getproductId() {
+    let url = new URL(window.location.href)
+    let productId = url.searchParams.get("productId")    
+    return productId
+}
 function displayItem(result) {
     // Ajout de l'image
     itemImg = document.createElement('img')
@@ -37,22 +54,23 @@ function displayItem(result) {
     }
 }   
 
-function errorServer() {
-    alert("Problème de serveur, veuillez ressayer ultérieurement.")
-}
-
-function getproductId() {
-    let url = new URL(window.location.href)
-    let productId = url.searchParams.get("productId")    
-    return productId
-}
-
 async function initDisplayItem() {
     let productId = getproductId()
-    item = await get(server, productId)
-    displayItem(item)
+    let result = await getServer(server, productId)
+    if (result) {
+        displayItem(result)
+        initButtonValid(result)
+    }
 }
 
+
+function initButtonValid(result) {
+    document.querySelector('#addToCart').addEventListener('click', function() {
+        checkErrorInput(new itemCart(result._id, colorSelect.value, document.querySelector('#quantity').value))
+    })
+}
+
+// Fonctions gestion du Cart
 class itemCart {
     constructor (_id, color, value) {
         this._id = _id;
@@ -62,25 +80,23 @@ class itemCart {
 }
 
 function getCart() {
-    let objLinea = localStorage.getItem("Cart");
     let cart = JSON.parse(localStorage.getItem("Cart"));
     return cart
 }
 
 function setCart(cart) {
-    let objLinea = JSON.stringify(cart);
-    localStorage.setItem("Cart", objLinea);
+    localStorage.setItem("Cart", JSON.stringify(cart));
 }
 
 function checkErrorInput(newAdd) {
-    if (newAdd.color && !isNaN(parseInt(newAdd.value))) {
+    if (newAdd.color && 0 < parseInt(newAdd.value) && parseInt(newAdd.value) <= 100) {
         checkCart(newAdd)
-    } else if (!newAdd.color && !isNaN(newAdd.value)) {
+    } else if (!newAdd.color && 0 < parseInt(newAdd.value) && parseInt(newAdd.value) <= 100) {
         alert("Veuillez entrer une couleur")
-    } else if (newAdd.color && isNaN(newAdd.value)) {
-        alert("Veuillez entrer un nombre d'article")
-    } else if (!newAdd.color && isNaN(newAdd.value)) {
-        alert("Veuillez entrer un nombre d'article et une couleur")
+    } else if (newAdd.color && !(0 < parseInt(newAdd.value) && parseInt(newAdd.value) <= 100)) {
+        alert("Veuillez entrer un nombre d'article (1-100)")
+    } else if (!newAdd.color && !(0 < parseInt(newAdd.value) && parseInt(newAdd.value) <= 100)) {
+        alert("Veuillez entrer un nombre d'article (1-100) et une couleur")
     }
 }
 
@@ -123,15 +139,11 @@ function addItemInCart(newAdd, cart) {
 }
 
 function endModifyCart(cart, value, color) {
-    alert(`Vous avez ajouté: ${value} article(s) de couleur ${color}`)
     setCart(cart)                  
+    if (confirm(`Vous avez ajouté: ${value} article(s) de couleur ${color}\n\nVoulez vous aller au panier?`)) {
+        document.location.href='../html/cart.html'
+    }
 }
-
-function addToCart() {
-    checkErrorInput(new itemCart(item._id, colorSelect.value, document.querySelector('#quantity').value))
-}
-
 
 initDisplayItem()
-document.querySelector('#addToCart').addEventListener('click', addToCart)
 

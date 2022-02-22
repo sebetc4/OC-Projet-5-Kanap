@@ -1,16 +1,29 @@
 const server = "http://localhost:3000/api/products";
 const itemsSection = document.querySelector('#items');
 
-
-async function get(url) {
-    let res = await fetch(url)
-    let result = await res.json()
-    .catch(function(err) {
-        errorServer()
-    });
-    return result
+// Fonctions server
+async function getServer(url) {
+    try {
+        let response = await fetch(url)
+        if (response.ok) {
+            let result = await response.json()
+            return result
+        } else {
+            errorServer(response.status)
+        }
+    }
+    catch(e) {
+        console.log(e)
+    }
 }
 
+function errorServer(error) {
+    alert("Problème de serveur, veuillez ressayer ultérieurement.")
+    console.error('Erreur de serveur: ' + error)
+}
+
+
+// Fonctions affichage des items
 function displayItems(result) {
     for (let i = 0; i < result.length; i++ ) {
         itemLink = document.createElement('a')
@@ -32,13 +45,11 @@ function displayItems(result) {
     }
 }
 
-function errorServer() {
-    alert("Problème de serveur, veuillez ressayer ultérieurement.")
-}
-
 async function InitDisplayItems() {
-    let result = await get(server)
-    displayItems(result)
+    let result = await getServer(server)
+    if (result) {
+        displayItems(result)
+    }
 }
 
 InitDisplayItems()

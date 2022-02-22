@@ -1,16 +1,30 @@
 const server = "http://localhost:3000/api/products";
 const cartItemsSection = document.querySelector('#cart__items');
+const totalPriceSpan = document.querySelector('#totalPrice')
+const totalQuantitySpan = document.querySelector('#totalQuantity')
 
-
-async function get(url) {
-    let res = await fetch(url)
-    let result = await res.json()
-    .catch(function(err) {
-        errorServer()
-    });
-    return result
+// Fonctions serveur
+async function getServer(url) {
+    try {
+        let response = await fetch(url)
+        if (response.ok) {
+            let result = await response.json()
+            return result
+        } else {
+            errorServer(response.status)
+        }
+    }
+    catch(e) {
+        console.log(e)
+    }
 }
 
+function errorServer(error) {
+    alert("Problème de serveur, veuillez ressayer ultérieurement.")
+    console.error('Erreur de serveur: ' + error)
+}
+
+// Fonction affichage du Cart
 function getIndexItem (result, cart, i) {
     for (let j = 0; j < result.length; j++) {
         if (result[j]._id.includes(cart[i]._id)) {
@@ -27,6 +41,7 @@ function displayCart(result, cart) {
 
             // Création de l'atricle
             let itemArticle = document.createElement('article')
+            itemArticle.classList.add('cart__item')
             itemArticle.setAttribute('data-id', cart[i]._id)
             itemArticle.setAttribute('data-color', cart[i].color)
 
@@ -83,6 +98,15 @@ function displayCart(result, cart) {
 
                 let cartItemContentSettingsDelete = document.createElement('div')
                 cartItemContentSettingsDelete.classList.add('cart__item__content__settings__delete')
+                cartItemContentSettingsDelete.addEventListener('click', function(i) {
+                    if (confirm("Voulez-vous supprimer cet article?")) {
+                        let cart = getCart()
+                        cart.splice(i, 1)
+                        setCart(cart)
+                        displayCartInfos(result, cart)
+                        itemArticle.remove()
+                    }
+                })
                 cartItemContentSettings.appendChild(cartItemContentSettingsDelete)
 
                     let cartItemContentSettingsDeleteP = document.createElement('p')
@@ -100,15 +124,33 @@ function displayCart(result, cart) {
 }
 
 function getCart() {
-    let objLinea = localStorage.getItem("Cart");
-    let cart = JSON.parse(objLinea);
+    let cart = JSON.parse(localStorage.getItem("Cart"));
     return cart
 }
 
+function setCart(cart) {
+    localStorage.setItem("Cart", JSON.stringify(cart));
+}
+
+function displayCartInfos(result, cart) {
+    let totalQuantity = 0
+    let totalPrice = 0
+    for (i = 0; i < cart.length; i++) {
+        indexItem = getIndexItem(result, cart, i)
+        totalQuantity +=  parseInt(cart[i].value)
+        totalPrice +=  parseInt(cart[i].value) * parseInt(result[indexItem].price)
+    }
+    totalQuantitySpan.innerHTML = totalQuantity
+    totalPriceSpan.innerHTML = totalPrice
+}
+
 async function initDisplayCart() {
-    let result = await get(server)
-    let cart = await getCart()
-    displayCart(result, cart)
+    let result = await getServer(server)
+    if (result) {
+        let cart = getCart()
+        displayCart(result, cart)
+        displayCartInfos(result, cart)
+    } 
 }
 
 initDisplayCart()
