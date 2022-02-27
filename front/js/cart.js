@@ -226,9 +226,8 @@ const formUtils = {
             allInputs[i].validValue = true
         } else {
             input.style.boxShadow = '0px 0px 1px 2px #fbbcbc'
-            msg.innerHTML = text
-            msg.style.marginTop = '3px'
-            msg.style.color = '#fbbcbc'
+            input.nextElementSibling.style.marginTop = '3px'
+            input.nextElementSibling.innerHTML = text
         }
     },
 
