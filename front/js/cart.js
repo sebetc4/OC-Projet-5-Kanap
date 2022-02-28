@@ -1,10 +1,11 @@
 import {serverUtils, cartUtils} from './utils.js';
 
+// Récupération des éléments du DOM
 const cartItemsSection = document.querySelector('#cart__items');
 const totalPriceSpan = document.querySelector('#totalPrice');
 const totalQuantitySpan = document.querySelector('#totalQuantity');
-
 const form = document.querySelector('.cart__order__form');
+
 
 // Gère l'affichage du panier
 const display = {
@@ -208,44 +209,91 @@ const formUtils = {
             if (allInputs[i].input.value != '') {
                 formUtils.checkValidInput(allInputs[i].input, allInputs[i].regExp, allInputs[i].text, i)
             };
-
             allInputs[i].input.addEventListener('change', function() {
                 formUtils.checkValidInput(this, allInputs[i].regExp, allInputs[i].text, i)
             });
         };
 
         // Initailisation du bouton de commande
-        form.addEventListener('submit', function() {
-            console.log('test')
+        form.addEventListener('submit', function(e) {
+            e.preventDefault()
+            if (formUtils.checkAllInputValid()) {
+                console.log('envoi')
+                formUtils.initPost()
+            }
         })
     },
 
     checkValidInput(input, regExp, text, i) {
         if (regExp.test(input.value)) {
             input.style.boxShadow = '0px 0px 1px 2px #00FF00'
+            input.nextElementSibling.innerHTML = ''
             allInputs[i].validValue = true
         } else {
             input.style.boxShadow = '0px 0px 1px 2px #fbbcbc'
             input.nextElementSibling.style.marginTop = '3px'
             input.nextElementSibling.innerHTML = text
+            allInputs[i].validValue = false
         }
     },
 
-    checkFormValid() {
-        if (this.chekAllInputValid) {
-            form.submit.style.display = 'block'
-        } else {
-            form.submit.style.display = 'none'
-        }
-    },
-
-    chekAllInputValid() {
+    checkAllInputValid() {
         for (let i = 0; i < allInputs.length; i++) {
             if (!allInputs[i].validValue) {
-                return flase
+                return false
             }
-            return true
         }
+        return true
+    },
+
+    async initPost() {
+        let order = {
+            contact: {
+                firstName: form.firstName.value,
+                lastName: form.lastName.value,
+                address: form.address.value,
+                city: form.city.value,
+                email: form.email.value
+            }, 
+            products: this.getProductsPost()
+        }
+
+        let resPost = await this.postServer(order)
+        if (resPost) {
+            document.location.href = '../html/confirmation.html?orderId=' + resPost.orderId
+            localStorage.clear('cart')
+        }
+    },
+
+    getProductsPost() {
+        let cart = cartUtils.get()
+        let products = []
+        for (let indexItemInCart = 0; indexItemInCart < cart.length; indexItemInCart++) {
+            if (!products.includes(cart[indexItemInCart]._id))
+            products.push((cart[indexItemInCart]._id))
+        }
+        return products
+    },
+
+    postServer(order) {
+        let res = fetch(serverUtils.url + '/order', {
+	        method: "POST",
+	        headers: { 
+                'Accept': 'application/json', 
+                'Content-Type': 'application/json' 
+            },
+	        body: JSON.stringify(order)
+        })
+        .then(function(res){
+            if (res.ok){
+            return res.json()
+            } else {
+                server.error("Erreur de serveur: " + res.status)
+            }
+        })
+        .then(res => res)
+        .catch(err => serverUtils.error("Problème avec l'opération fetch: " + err.message))
+        return res
     }
 }
 

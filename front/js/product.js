@@ -113,7 +113,7 @@ const newAddUtils = {
     endModify(cart, value, color) {
         cartUtils.set(cart)                  
         if (confirm(`Vous avez ajouté: ${value} article(s) de couleur ${color}\n\nVoulez vous aller au panier?`)) {
-            document.location.href='../html/cart.html'
+            document.location.href = '../html/cart.html'
         }
     }
 }
