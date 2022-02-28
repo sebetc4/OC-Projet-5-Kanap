@@ -4,8 +4,8 @@ const serverUtils = {
 
     /**
     * Permet de faire une requète get (Fetch)
-    * @param { string } url
-    * @return { Promise } réponse 
+    * @param { string } target
+    * @return { Promise } reponse du serveur 
     */
     get(target) {
         let res = fetch(target)
@@ -23,7 +23,7 @@ const serverUtils = {
 
      /**
     * Gère les erreurs de get()
-    * @param { string } text
+    * @param { string } err
     */
     error(err) {
         alert("Problème de serveur, veuillez ressayer ultérieurement.");
@@ -36,13 +36,13 @@ const lSUtils = {
     
     /**
     * Récupère l'item du localStorage
-    * @return { object } item
+    * @return { object } cart
     */
     get() { return JSON.parse(localStorage.getItem("cart")); },
     
     /**
     * Envoi l'item dans le localStorage
-    * @param { object } item
+    * @param { object } cart
     */
     set(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
 }
