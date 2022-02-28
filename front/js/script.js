@@ -1,9 +1,9 @@
-import {serverUtils} from './utils.js';
+import {serverUtils as servU} from './utils.js';
 const itemsSection = document.querySelector('#items');
 
 const display = {
     async init() {
-        let resApi = await serverUtils.get(serverUtils.url)
+        let resApi = await servU.get(servU.url)
         if (resApi) {
             this.createItems(resApi)
         }

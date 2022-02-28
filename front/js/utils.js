@@ -1,11 +1,9 @@
-/**
-* Méthodes du serveur
-*/
+//  Méthodes du serveur
 const serverUtils = {
     url: "http://localhost:3000/api/products",
 
     /**
-    * Permet de faire une requète get en utilisant Fetch
+    * Permet de faire une requète get (Fetch)
     * @param { string } url
     * @return { Promise } réponse 
     */
@@ -33,14 +31,20 @@ const serverUtils = {
     }
 }
 
-const cartUtils = {
+// Méthodes du localStorage
+const lSUtils = {
+    
     /**
-    * Récupère l'item du LocalStorage
-    * @retur { string } text
+    * Récupère l'item du localStorage
+    * @return { object } item
     */
     get() { return JSON.parse(localStorage.getItem("cart")); },
     
+    /**
+    * Envoi l'item dans le localStorage
+    * @param { object } item
+    */
     set(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
 }
 
-export {serverUtils, cartUtils}
+export {serverUtils, lSUtils}

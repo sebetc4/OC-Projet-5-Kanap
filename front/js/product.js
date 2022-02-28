@@ -1,12 +1,12 @@
-import {serverUtils, cartUtils} from './utils.js';
+import {serverUtils as servU, lSUtils as lSU} from './utils.js';
 
 const colorSelect = document.querySelector('#colors');
 
-// Gère l'affichage de l'item
+//  Méthodes d'affichage
 const display = {
     async init() {
         let productId = this.getProductId()
-        let resApi = await serverUtils.get(serverUtils.url + "/" + productId)
+        let resApi = await servU.get(servU.url + "/" + productId)
         if (resApi) {
             this.createItem(resApi)
             newAddUtils.init(resApi)
@@ -76,7 +76,7 @@ const newAddUtils = {
     },
 
     checkIfCartExist(newAdd) {
-        let cart = cartUtils.get()
+        let cart = lSU.get()
         if (cart === null) {
             cart = [newAdd]
             this.endModify(cart, newAdd.value, newAdd.color)
@@ -111,7 +111,7 @@ const newAddUtils = {
     },
     
     endModify(cart, value, color) {
-        cartUtils.set(cart)                  
+        lSU.set(cart)                  
         if (confirm(`Vous avez ajouté: ${value} article(s) de couleur ${color}\n\nVoulez vous aller au panier?`)) {
             document.location.href = '../html/cart.html'
         }

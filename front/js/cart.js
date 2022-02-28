@@ -1,4 +1,4 @@
-import {serverUtils, cartUtils} from './utils.js';
+import {serverUtils as servU, lSUtils as lSU} from './utils.js';
 
 // Récupération des éléments du DOM
 const cartItemsSection = document.querySelector('#cart__items');
@@ -10,9 +10,9 @@ const form = document.querySelector('.cart__order__form');
 // Gère l'affichage du panier
 const display = {
     async init() {
-        let resApi = await serverUtils.get(serverUtils.url)
+        let resApi = await servU.get(servU.url)
         if (resApi) {
-            let cart = cartUtils.get()
+            let cart = lSU.get()
             if (cart && cart.length != 0) {
                 this.createCart(resApi, cart)
                 this.createCartInfos(resApi, cart)
@@ -141,9 +141,9 @@ const display = {
 const modifyCartUtils = {
     deletItem(resApi, indexItemInCart, itemArticle) {
         if (confirm("Voulez-vous supprimer cet article?")) {
-            let cart = cartUtils.get()
+            let cart = lSU.get()
             cart.splice(indexItemInCart, 1)
-            cartUtils.set(cart)
+            lSU.set(cart)
             display.createCartInfos(resApi, cart)
             itemArticle.remove()
             if (cart.length === 0) {
@@ -176,9 +176,9 @@ const modifyCartUtils = {
     },
 
     changeValueItem(resApi, newValue, indexItemInCart){
-        let cart = cartUtils.get()
+        let cart = lSU.get()
         cart[indexItemInCart].value = newValue.toString() 
-        cartUtils.set(cart)
+        lSU.set(cart)
         display.createCartInfos(resApi, cart)                  
     },
 }
@@ -266,7 +266,7 @@ const formUtils = {
     },
 
     getProductsPost() {
-        let cart = cartUtils.get()
+        let cart = lSU.get()
         let products = []
         for (let indexItemInCart = 0; indexItemInCart < cart.length; indexItemInCart++) {
             if (!products.includes(cart[indexItemInCart]._id))
@@ -276,7 +276,7 @@ const formUtils = {
     },
 
     postServer(order) {
-        let res = fetch(serverUtils.url + '/order', {
+        let res = fetch(servU.url + '/order', {
 	        method: "POST",
 	        headers: { 
                 'Accept': 'application/json', 
@@ -288,11 +288,11 @@ const formUtils = {
             if (res.ok){
             return res.json()
             } else {
-                server.error("Erreur de serveur: " + res.status)
+                servU.error("Erreur de serveur: " + res.status)
             }
         })
         .then(res => res)
-        .catch(err => serverUtils.error("Problème avec l'opération fetch: " + err.message))
+        .catch(err => servU.error("Problème avec l'opération fetch: " + err.message))
         return res
     }
 }
