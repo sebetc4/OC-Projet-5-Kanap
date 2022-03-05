@@ -1,15 +1,15 @@
-const display = {
-    
-    init() {
-        orderId = this.getOrderId()
-        document.querySelector('#orderId').innerHTML = orderId
-    },
+import {getValueInUrl} from './utils.js';
 
-    getOrderId() {
-        let url = new URL(window.location.href)
-        let orderId = url.searchParams.get("orderId")    
-        return orderId
+class Display {
+
+    constructor() {
+        this.orderId = getValueInUrl("orderId");
+        this.displayOrderId();
+    }
+    
+    displayOrderId() {
+        document.querySelector('#orderId').innerHTML = this.orderId;
     }
 }
 
-display.init()
+new Display;
