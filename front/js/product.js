@@ -81,11 +81,11 @@ class Add {
 
     // Contrôle si un panier est présent dans le localStorage
     checkIfCartExist() {
-        if (cart === null) {
+        if (!cart || cart.length === 0) {
             cart = [this];
-            this.endAdd();
+            this.endAdd(false, this.value);
         } else { 
-            this.checkIfItemExist(false, this.value);
+            this.checkIfItemExist();
         }
     }
 

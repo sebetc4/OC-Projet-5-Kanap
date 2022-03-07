@@ -11,25 +11,6 @@ const form = document.querySelector('.cart__order__form');
 // Récupération du pannier dans le localStorage
 let cart = lSU.get()
 
-
-// Classe des Inputs
-class Input {
-
-    /**
-    * @param { object } display
-    * @param { object } input
-    * @param { string } regExp
-    * @param { string } text
-    */
-    constructor (display, input, regExp, text) {
-        this.input = input;
-        this.regExp = regExp;
-        this.text = text;
-        this.validValue = false;
-        display.allInputs.push(this);
-    }
-}
-
 // Class d'affichage
 class Display {
 
@@ -42,14 +23,16 @@ class Display {
     async init() {
         this.resApi = await servU.get(servU.url);
         if (this.resApi) {
-            if (cart && cart.length != 0) {
+            if (cart && cart.length !== 0) {
                 this.displayCart();
                 this.displayCartInfos();
                 new Form(this)
             } else {
                 this.displayNoCart();
             }
-        } 
+        } else {
+            this.displayNoCart();
+        }
     }
 
     // Modification du DOM pour ajouter le panier
@@ -167,6 +150,26 @@ class Display {
     }
 }
 
+
+// Classe des Inputs
+class Input {
+
+    /**
+    * @param { object } form
+    * @param { object } input
+    * @param { string } regExp
+    * @param { string } text
+    */
+    constructor (form, input, regExp, text) {
+        this.input = input;
+        this.regExp = regExp;
+        this.text = text;
+        this.validValue = false;
+        form.allInputs.push(this);
+    }
+}
+
+
 // Classe du formulaire
 class Form {
 
@@ -183,11 +186,11 @@ class Form {
     init() {
 
         // Initialisation des inputs
-        new Input(this, form.firstName, /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹ '-]+$/u, "Prénom non valide (ex: <em>Jean</em>)");
-        new Input(this, form.lastName, /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹ '-]+$/u, "Nom non valide (ex: <em>Dubois</em>");
+        new Input(this, form.firstName, /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹ '-]{2,}$/u, "Prénom non valide (ex: <em>Jean</em>)");
+        new Input(this, form.lastName, /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹ '-]{2,}$/u, "Nom non valide (ex: <em>Dubois</em>");
         new Input(this, form.address, /^[a-zA-Z0-9àáâèéêëėïç '-.]+$/u, "Adresse non valide (ex: <em>101 Rue des Moines</em>)");
         new Input(this, form.city, /^[0-9]{5} [a-zA-Zàáâèéêëėïç '-.]+$/u, "Ville non valide (ex: <em>75017 Paris</em>)");
-        new Input(this, form.email, /^[a-zA-Z0-9-.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/, "Adresse email non valide (ex: <em>jean-dubois@gmail.com</em>)");
+        new Input(this, form.email, /^[a-zA-Z0-9_.-]+[@]{1}[a-zA-Z0-9_.-]+[.]{1}[a-z]{2,10}$/, "Adresse email non valide (ex: <em>jean-dubois@gmail.com</em>)");
 
         for (let i of this.allInputs) {
             // Vérification des inputs au chargement de la page
@@ -203,6 +206,8 @@ class Form {
             e.preventDefault();
             if (this.checkAllInputValid()) {
                 new Request;
+            } else {
+                alert("Attention, les informations que vous avez saisi ne sont pas toutes valides!")
             }
         })
     }
@@ -212,7 +217,7 @@ class Form {
     * @param { object } i
     */
     checkValidInput(i) {
-        if (i.regExp.test(input.value)) {
+        if (i.regExp.test(i.input.value)) {
             i.input.style.boxShadow = '0px 0px 1px 2px #00FF00';
             i.input.nextElementSibling.innerHTML = '';
             i.validValue = true;
@@ -278,13 +283,10 @@ class ModifyItemInCart {
         }
     }
 
-    /**
-    * Supprime un article
-    */
+    // Supprime un article
     delete() {
         if (confirm("Voulez-vous supprimer cet article?")) {
             cart.splice(this.index, 1)
-            console.log(cart)
             lSU.set(cart);
             this.display.displayCartInfos();
             this.itemArticle.remove();
@@ -351,11 +353,11 @@ class Request {
             }, 
             products: this.getProductsPost()
         }
-        this.initPost();
+        this.init();
     }
 
     // Initialise la requète
-    async initPost() {
+    async init() {
         let resPost = await this.post();
         if (resPost) {
             document.location.href = '../html/confirmation.html?orderId=' + resPost.orderId
@@ -381,7 +383,7 @@ class Request {
     * @return { promise }
     */
     post() {
-        let res = fetch(servU.url + '/order', {
+        let resApi = fetch(servU.url + '/order', {
 	        method: "POST",
 	        headers: { 
                 'Accept': 'application/json', 
@@ -396,9 +398,8 @@ class Request {
                     servU.error("Erreur de serveur: " + res.status);
                 }
             })
-            .then(res => res)
             .catch(err => servU.error("Problème avec l'opération fetch: " + err.message))   
-        return res;
+        return resApi;
     }
 }
 

@@ -8,7 +8,7 @@ const serverUtils = {
     * @return { promise }
     */
     get(target) {
-        let res = fetch(target)
+        let resApi = fetch(target)
             .then(function(res){
                 if (res.ok) {
                     return res.json();
@@ -16,9 +16,8 @@ const serverUtils = {
                     this.error("Erreur de serveur: " + res.status);
                 }
             })
-            .then(res => res)
             .catch(err => this.error("Problème avec l'opération fetch: " + err.message));
-        return res;
+        return resApi;
     },
 
     /**
