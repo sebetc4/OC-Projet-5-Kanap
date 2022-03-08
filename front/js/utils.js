@@ -55,6 +55,7 @@ const lSUtils = {
 /**
 * Retourne la valeur dans l'url du paramètre donné
 * @param { string } param
+* @return { string }
 */
 function getValueInUrl(param) { 
     return (new URL(window.location.href)).searchParams.get(param); 

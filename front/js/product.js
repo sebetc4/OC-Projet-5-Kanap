@@ -58,6 +58,9 @@ class Display {
 // Classe d'ajout au panier
 class Add {
 
+    /**
+    * @param { object } display
+    */
     constructor (display) {
         this._id = display.resApi._id;
         this.color = colorSelect.value;
@@ -110,7 +113,10 @@ class Add {
         this.endAdd(false, this.value);
     }
 
-    // Modifie la valeur de l'item
+    /**
+    * Modifie la valeur de l'item
+    * @param { object } iC
+    */
     modifyValueItem(iC) {
         if (iC.value === '100') {
             this.endAdd(true);
@@ -119,7 +125,7 @@ class Add {
             if (newValue > 100) {
                 newValue = (100 - this.value)
                 iC.value = '100'
-                this.endAdd(false, newValue);
+                this.endAdd(false, newValue.toString());
             } else {
                 iC.value = newValue.toString()
                 this.endAdd(false, this.value);
@@ -127,7 +133,11 @@ class Add {
         }
     }
     
-    // Envoi le panier dans le localStorage et affiche un message à l'utilisateur
+    /**
+    * Envoie le panier dans le localStorage et affiche un message à l'utilisateur
+    * @param { boolean } maxArticle
+    * @param { string } value
+    */
     endAdd(maxArticle, value) {
         let sentence
         lSU.set(cart);

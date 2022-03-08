@@ -117,7 +117,7 @@ class Display {
     }
 
     /**
-    * Retourne l'objet (dans la réponse API) de l'item demandé
+    * Retourne l'objet (de la réponse API) de l'item demandé
     * @param { object } iC
     * @return { object }
     */
@@ -366,7 +366,7 @@ class Request {
     };
 
     /**
-    * Retourne la liste des ids des produits
+    * Retourne le tableau des ids des produits
     * @return { array } 
     */
     getProductsPost() {
@@ -379,7 +379,7 @@ class Request {
     };
 
     /**
-    * Retourne la réponse d'un requête post (fetch)
+    * Retourne la réponse d'une requête post (fetch)
     * @return { promise }
     */
     post() {
